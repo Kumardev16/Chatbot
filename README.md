@@ -33,11 +33,13 @@ To get started with this project, you can clone the repository and follow the se
    ```
 
 1.Install NPM packages:
-
+ ```sh
    npm install
+ ```
 
 Usage
 
 To start the chatbot, run:
-
+ ```sh
 npm start
+```
