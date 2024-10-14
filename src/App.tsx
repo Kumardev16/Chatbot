@@ -1,7 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
+
 import { Send, Loader2, Menu, Settings, HelpCircle, Activity, Bot, User, Sparkles, X } from 'lucide-react';
 
-const API_KEY = 'AIzaSyD-kvFzEo9vFoChd8ymqUNJtw7zepYm83E';
+const API_KEY = import.meta.env.VITE_API;
 
 interface Message {
   role: 'user' | 'assistant';
