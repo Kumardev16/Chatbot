@@ -63,7 +63,7 @@ function App() {
 
       // Simulate creating a new chatbot and generating a deploy link
       setTimeout(() => {
-        setDeployLink(`https://example.com/chatbot-${Date.now()}`);
+        setDeployLink(`https://ai-converso.vercel.app/chatbot-${Date.now()}`);
       }, 2000);
     } catch (error) {
       console.error('Error:', error);
