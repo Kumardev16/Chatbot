@@ -32,14 +32,14 @@ To get started with this project, you can clone the repository and follow the se
    git clone https://github.com/imRahul05/Chatbot.git
    ```
 
-1.Install NPM packages:
- ```sh
+2.Install NPM packages:
+   ```sh
    npm install
- ```
+   ```
 
 Usage
 
 To start the chatbot, run:
- ```sh
-npm start
-```
+  ```sh
+  npm start
+  ```
