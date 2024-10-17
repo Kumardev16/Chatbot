@@ -1,5 +1,4 @@
 import React, { useState, useRef, useEffect } from 'react';
-
 import { Send, Loader2, Menu, Settings, HelpCircle, Activity, Bot, User, Sparkles, X } from 'lucide-react';
 
 const API_KEY = import.meta.env.VITE_API;
@@ -13,7 +12,6 @@ function App() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [deployLink, setDeployLink] = useState('');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
   const [activeTab, setActiveTab] = useState('chat');
@@ -28,6 +26,17 @@ function App() {
   useEffect(() => {
     document.body.className = theme;
   }, [theme]);
+
+  const processMarkdown = (text: string) => {
+    // Convert ** to <strong> for bold text
+    text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    
+    // Convert single line * to bullet points
+    text = text.replace(/^\* (.+)$/gm, '<li>$1</li>');
+    text = text.replace(/(<li>.*<\/li>)/s, '<ul>$1</ul>');
+    
+    return text;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -54,17 +63,13 @@ function App() {
       }
 
       const data = await response.json();
+      const processedContent = processMarkdown(data.candidates[0].content.parts[0].text);
       const assistantMessage: Message = {
         role: 'assistant',
-        content: data.candidates[0].content.parts[0].text,
+        content: processedContent,
       };
 
       setMessages((prev) => [...prev, assistantMessage]);
-
-      // Simulate creating a new chatbot and generating a deploy link
-      setTimeout(() => {
-        setDeployLink(`https://example.com/chatbot-${Date.now()}`);
-      }, 2000);
     } catch (error) {
       console.error('Error:', error);
       setMessages((prev) => [
@@ -81,7 +86,6 @@ function App() {
 
   const newChat = () => {
     setMessages([]);
-    setDeployLink('');
     setActiveTab('chat');
   };
 
@@ -115,7 +119,10 @@ function App() {
                         {message.role === 'user' ? 'You' : 'Assistant'}
                       </span>
                     </div>
-                    <p className="whitespace-pre-wrap">{message.content}</p>
+                    <div 
+                      className="whitespace-pre-wrap"
+                      dangerouslySetInnerHTML={{ __html: message.content }}
+                    />
                   </div>
                 </div>
               ))}
@@ -127,7 +134,7 @@ function App() {
                   type="text"
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
-                  placeholder="Enter a prompt to create a new chatbot..."
+                  placeholder="Enter your message..."
                   className={`flex-1 p-2 border rounded-l-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                     theme === 'dark' ? 'bg-gray-700 text-white border-gray-600' : 'bg-white text-gray-900 border-gray-300'
                   }`}
@@ -144,11 +151,6 @@ function App() {
                   )}
                 </button>
               </form>
-              {deployLink && (
-                <div className={`mt-4 p-3 rounded-lg ${theme === 'dark' ? 'bg-green-800 text-green-100' : 'bg-green-100 text-green-800'}`}>
-                  <p>New chatbot created! Deploy link: <a href={deployLink} target="_blank" rel="noopener noreferrer" className="underline">{deployLink}</a></p>
-                </div>
-              )}
             </div>
           </>
         );
@@ -156,11 +158,10 @@ function App() {
         return (
           <div className="p-4">
             <h2 className="text-2xl font-bold mb-4">Help</h2>
-            <p>Welcome to the Chatbot Creator AI! Here's how to use it:</p>
+            <p>Welcome to the AI Chat! Here's how to use it:</p>
             <ul className="list-disc pl-5 mt-2">
-              <li>Enter a prompt describing the chatbot you want to create.</li>
-              <li>The AI will generate a response and create a new chatbot based on your input.</li>
-              <li>You'll receive a deploy link for your new chatbot.</li>
+              <li>Enter your message or question in the input field at the bottom of the chat.</li>
+              <li>The AI will generate a response based on your input.</li>
               <li>Use the sidebar to start a new chat, toggle the theme, or view your activity.</li>
             </ul>
           </div>
@@ -174,7 +175,7 @@ function App() {
               {messages.map((message, index) => (
                 <li key={index}>
                   {message.role === 'user' ? 'You: ' : 'Assistant: '}
-                  {message.content.substring(0, 50)}...
+                  {message.content.replace(/<[^>]*>/g, '').substring(0, 50)}...
                 </li>
               ))}
             </ul>
@@ -193,7 +194,7 @@ function App() {
           <div className="flex items-center justify-between mb-8">
             <div className="flex items-center">
               <Bot className="w-8 h-8 mr-2" />
-              <h1 className="text-xl font-bold">Chatbot Creator</h1>
+              <h1 className="text-xl font-bold">AI Chat</h1>
             </div>
             <button onClick={toggleSidebar} className="md:hidden">
               <X className="w-6 h-6" />
@@ -227,7 +228,7 @@ function App() {
           <button onClick={toggleSidebar} className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700">
             <Menu className="w-6 h-6" />
           </button>
-          <h2 className="text-lg font-semibold">AI Chatbot</h2>
+          <h2 className="text-lg font-semibold">AI Chat</h2>
           <div className="w-6 h-6"></div> {/* Placeholder for symmetry */}
         </header>
 
